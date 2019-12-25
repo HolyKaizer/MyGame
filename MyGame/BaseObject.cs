@@ -3,13 +3,32 @@ using System.Drawing;
 
 namespace MyGame 
 {
-
+    /// <summary>
+    /// Базовый класс в иерархии игровых объектов
+    /// </summary>
 	class BaseObject
 	{
+        /// <summary>
+        /// Позиция игрового объекта 
+        /// </summary>
 		protected Point Pos;
+
+        /// <summary>
+        /// Направление игрового объекта 
+        /// </summary>
 		protected Point Dir;
+
+        /// <summary>
+        /// Размер игрового объекта
+        /// </summary>
 		protected Size Size;
 
+        /// <summary>
+        /// Базовый конструктор инициализирующий все поля
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="dir"></param>
+        /// <param name="size"></param>
 		public BaseObject(Point pos, Point dir, Size size) 
 		{ 
 			Pos = pos;
@@ -17,12 +36,18 @@ namespace MyGame
 			Size = size;
 		}  
 
+        /// <summary>
+        /// Метод, занимающийся отрисовкой объекта
+        /// </summary>
 		public virtual void Draw() 
 		{ 
 			Game.Buffer.Graphics.DrawEllipse(Pens.White, Pos.X, Pos.Y, 
 												Size.Width, Size.Height);
 		}
 
+        /// <summary>
+        /// Метод, отвечающий за поведения объекта на поле
+        /// </summary>
 		public virtual void Update() 
 		{
 			Pos.X = Pos.X + Dir.X;

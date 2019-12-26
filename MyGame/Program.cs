@@ -20,7 +20,7 @@ namespace MyGame
 				Height = Screen.PrimaryScreen.Bounds.Height
 				
 			};
-			form.Width = 1200;
+			form.Width = 1000;
 			form.Height = 800;
 			Game.Init(form);
 			form.Show();

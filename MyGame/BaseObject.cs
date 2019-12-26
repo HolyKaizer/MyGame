@@ -17,6 +17,7 @@ namespace MyGame
     /// </summary>
 	abstract class BaseObject: ICollision
 	{
+        protected static Random random;
         /// <summary>
         /// Позиция игрового объекта 
         /// </summary>
@@ -41,7 +42,7 @@ namespace MyGame
 		public BaseObject(Point pos, Point dir, Size size) 
 		{
             CheckForAccording(pos, dir, size);
-
+            random = new Random();
             Pos = pos;
 			Dir = dir; 
 			Size = size;
@@ -55,8 +56,8 @@ namespace MyGame
         /// <param name="size">Размер объекта</param>
         protected void CheckForAccording(Point pos, Point dir, Size size)
         {
-            if (pos.X < 0 || pos.Y < 0)
-                throw new GameObjectException("Положение объекта не может быть отрицательным!");
+            if (pos.X < -100 || pos.Y < -100 || pos.X > Game.Width + 100 || pos.Y > Game.Height + 100 )
+                throw new GameObjectException("Положение объекта не может быть отрицательным и выходить за размер экрана!");
             if (dir.X > 100 || dir.Y > 100)
                 throw new GameObjectException("Максимальная скорость объекта - 100. Выход за пределы!");
             if (size.Width < 2 || size.Height < 2)

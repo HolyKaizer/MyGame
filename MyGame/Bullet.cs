@@ -29,10 +29,9 @@ namespace MyGame
         /// </summary>
         public void Reset()
         {
-            Random rnd = new Random();
-
             Pos.X = 0;
-            Pos.Y = rnd.Next(0, Size.Height);
+            Pos.Y = random.Next(0, Game.Height);
+            
         }
     }
 }

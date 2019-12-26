@@ -56,15 +56,15 @@ namespace MyGame
 
 			_bullet = new Bullet(new Point(0, 200), new Point(5, 0), new Size(10,3));
 
-			_asteroids = new Asteroid[3];
+			_asteroids = new Asteroid[30];
 			Random rnd = new Random();
 
             //Заполнение массива -objs[] звездами со случайной скоростью, позицией и размером
 			for (int i = 0; i < _objs.Length; i++)
 			{
 				Point pos = new Point(rnd.Next(20, Width - 20), rnd.Next(20, Height - 20));
-				Point dir = new Point(rnd.Next(1, 14), 0);
-				int objWidth = rnd.Next(1, 10);
+				Point dir = new Point(rnd.Next(2, 14), 0);
+				int objWidth = rnd.Next(2, 10);
 				Size sz = new Size(objWidth, objWidth);
 
 				_objs[i] = new Star(pos, dir, sz);
@@ -74,7 +74,7 @@ namespace MyGame
 			//Заполнение массива _asteroids[] астероидами со случайной скоростью, позицией и размером
 			for (int i = 0; i < _asteroids.Length; i++)
 			{
-				Point pos = new Point(1000, rnd.Next(20, Height - 20));
+				Point pos = new Point(Width - 50, rnd.Next(20, Height - 20));
 				Point dir = new Point(rnd.Next(-1, 10), rnd.Next(5, 50));
 				int objWidth = rnd.Next(5, 50);
 				Size sz = new Size(objWidth, objWidth);

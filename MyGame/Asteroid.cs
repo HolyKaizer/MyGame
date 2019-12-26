@@ -20,6 +20,7 @@ namespace MyGame
         public override void Draw()
         {
             Game.Buffer.Graphics.FillEllipse(Brushes.White, Pos.X, Pos.Y, Size.Width, Size.Height);
+            Console.WriteLine($"Asteroid was drawed at position (x: {Pos.X}, y: {Pos.Y})");
         }
 
         /// <summary>
@@ -46,10 +47,8 @@ namespace MyGame
 
         public void Reset()
         {
-            Random rnd = new Random();
-
             Pos.X = Size.Width - 100;
-            Pos.Y = rnd.Next(20, Size.Height - 20);
+            Pos.Y = random.Next(20, Game.Height - 20);
         }
     }
 }

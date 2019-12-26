@@ -4,9 +4,18 @@ using System.Drawing;
 namespace MyGame 
 {
     /// <summary>
+    /// Интерфейс дающий функционал столкновений 
+    /// </summary>
+    interface ICollision
+    {
+        bool Collision(ICollision obj);
+        Rectangle Rect { get; } 
+    }
+
+    /// <summary>
     /// Базовый класс в иерархии игровых объектов
     /// </summary>
-	class BaseObject
+	abstract class BaseObject: ICollision
 	{
         /// <summary>
         /// Позиция игрового объекта 
@@ -37,13 +46,22 @@ namespace MyGame
 		}
 
         /// <summary>
+        /// Размер collision box'a у объекта 
+        /// </summary>
+        public Rectangle Rect => new Rectangle(Pos, Size);
+
+        /// <summary>
+        /// Произошло ли столкновение между двумя объектами
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public bool Collision(ICollision obj) => obj.Rect.IntersectsWith(this.Rect);
+
+
+        /// <summary>
         /// Virtual метод отрисовывает BaseObject на игровом поле  
         /// </summary>
-        public virtual void Draw() 
-		{ 
-			Game.Buffer.Graphics.DrawEllipse(Pens.White, Pos.X, Pos.Y, 
-												Size.Width, Size.Height);
-		}
+        public abstract void Draw();
 
         /// <summary>
         /// Virtual метод обновляет положение BaseObject на игровом поле 

@@ -13,8 +13,13 @@ namespace MyGame
         /// </summary>
         /// <param name="args"></param>
 		static void Main(string[] args) 
-		{ 
-			Form form = new Form();
+		{
+			Form form = new Form()
+			{
+				Width = Screen.PrimaryScreen.Bounds.Width,
+				Height = Screen.PrimaryScreen.Bounds.Height
+				
+			};
 			form.Width = 1200;
 			form.Height = 800;
 			Game.Init(form);

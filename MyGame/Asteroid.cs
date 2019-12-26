@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace MyGame
 {
+
     class Asteroid : BaseObject, ICloneable
     {
         public int Power { get; set; }
@@ -22,7 +23,7 @@ namespace MyGame
         }
 
         /// <summary>
-        /// Клонируем объект астероида
+        /// Клонируем объект астероид
         /// </summary>
         /// <returns></returns>
         public object Clone()
@@ -32,6 +33,23 @@ namespace MyGame
 
             return asteroid;
         }
-        
+
+        public override void Update()
+        {
+            Pos.X = Pos.X + Dir.X;
+            Pos.Y = Pos.Y + Dir.Y;
+            if (Pos.X < 0) Dir.X = -Dir.X;
+            if (Pos.X > Game.Width) Dir.X = -Dir.X;
+            if (Pos.Y < 0) Dir.Y = -Dir.Y;
+            if (Pos.Y > Game.Height) Dir.Y = -Dir.Y;
+        }
+
+        public void Reset()
+        {
+            Random rnd = new Random();
+
+            Pos.X = Size.Width - 100;
+            Pos.Y = rnd.Next(20, Size.Height - 20);
+        }
     }
 }

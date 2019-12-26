@@ -151,13 +151,24 @@ namespace MyGame
 			foreach (BaseObject obj in _objs) 
 				obj.Update(); 
 
+            //Обновляем каждый астероид 
 			foreach (Asteroid a in _asteroids)
 			{
 				a.Update();
-				if(a.Collision(_bullet)) { System.Media.SystemSounds.Hand.Play(); }
+				if(a.Collision(_bullet))
+                {
+                    System.Media.SystemSounds.Hand.Play();
+                    _bullet.Reset();
+                    a.Reset();
+                }
 			}
 
+            //Обновляем снаряд
 			_bullet.Update();
+
+            //Проверяем размеры экрана
+            if (Width > 1000 || Height > 1000)
+                throw new ArgumentOutOfRangeException();
 		}
 	}
 

@@ -39,11 +39,30 @@ namespace MyGame
         /// <param name="dir"></param>
         /// <param name="size"></param>
 		public BaseObject(Point pos, Point dir, Size size) 
-		{ 
-			Pos = pos;
+		{
+            CheckForAccording(pos, dir, size);
+
+            Pos = pos;
 			Dir = dir; 
 			Size = size;
 		}
+
+        /// <summary>
+        /// Проверка на выход за допустимые пределы
+        /// </summary>
+        /// <param name="pos">Положение объекта</param>
+        /// <param name="dir">Скорость и направление объекта</param>
+        /// <param name="size">Размер объекта</param>
+        protected void CheckForAccording(Point pos, Point dir, Size size)
+        {
+            if (pos.X < 0 || pos.Y < 0)
+                throw new GameObjectException("Положение объекта не может быть отрицательным!");
+            if (dir.X > 100 || dir.Y > 100)
+                throw new GameObjectException("Максимальная скорость объекта - 100. Выход за пределы!");
+            if (size.Width < 2 || size.Height < 2)
+                throw new GameObjectException("Минимальный размер 2 еденицы. Выход за пределы!");
+
+        }
 
         /// <summary>
         /// Размер collision box'a у объекта 
@@ -66,14 +85,6 @@ namespace MyGame
         /// <summary>
         /// Virtual метод обновляет положение BaseObject на игровом поле 
         /// </summary>
-		public virtual void Update() 
-		{
-			Pos.X = Pos.X + Dir.X;
-			Pos.Y = Pos.Y + Dir.Y;
-			if (Pos.X < 0) Dir.X = -Dir.X;
-			if (Pos.X > Game.Width) Dir.X = -Dir.X;
-			if (Pos.Y < 0) Dir.Y = -Dir.Y;
-			if (Pos.Y > Game.Height) Dir.Y = -Dir.Y;
-		}
+		abstract public void Update();
 	}  
 }

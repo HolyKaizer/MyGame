@@ -8,6 +8,8 @@ namespace MyGame
     /// </summary>
 	class Star : BaseObject
 	{
+        private Image image;
+
         /// <summary>
         /// Конструктор, задающий все поля  
         /// </summary>
@@ -16,21 +18,22 @@ namespace MyGame
         /// <param name="size"></param>
 		public Star(Point pos, Point dir, Size size) : base(pos, dir, size)
 		{
+            image = Image.FromFile("Work_Star.jpg");
+        }
 
-		}
-            
+        
         /// <summary>
-        /// Virtual метод отрисовывает BaseObject на игровом поле     
+        /// Метод отрисовывает звуезду на игровом поле    
         /// </summary>
 		public override void Draw()
 		{
-			Image starImage = Image.FromFile("Work_Star.jpg");
+			
 			Rectangle sz = new Rectangle(Pos.X, Pos.Y, Size.Width, Size.Height);
-			Game.Buffer.Graphics.DrawImage(starImage, sz);
+			Game.Buffer.Graphics.DrawImage(image, sz);
 		}
 
         /// <summary>
-        /// Virtual метод обновляет положение BaseObject на игровом поле     
+        /// Метод управляет поведением звезды на игровом поле     
         /// </summary>
         public override void Update()
 		{

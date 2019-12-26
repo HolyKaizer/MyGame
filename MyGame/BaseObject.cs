@@ -34,19 +34,19 @@ namespace MyGame
 			Pos = pos;
 			Dir = dir; 
 			Size = size;
-		}  
+		}
 
         /// <summary>
-        /// Метод, занимающийся отрисовкой объекта
+        /// Virtual метод отрисовывает BaseObject на игровом поле  
         /// </summary>
-		public virtual void Draw() 
+        public virtual void Draw() 
 		{ 
 			Game.Buffer.Graphics.DrawEllipse(Pens.White, Pos.X, Pos.Y, 
 												Size.Width, Size.Height);
 		}
 
         /// <summary>
-        /// Метод, отвечающий за поведения объекта на поле
+        /// Virtual метод обновляет положение BaseObject на игровом поле 
         /// </summary>
 		public virtual void Update() 
 		{

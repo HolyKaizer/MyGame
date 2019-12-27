@@ -8,6 +8,7 @@ namespace MyGame
     /// </summary>
     class Ship : BaseObject
     {
+        private Image image;
         /// <summary>
         /// Событие реагирующее на смерть
         /// </summary>
@@ -24,7 +25,7 @@ namespace MyGame
         /// <param name="n">Значение на которое стоит изменить</param>
         public void EnergyDecrease(int n)
         {
-
+            Energy -= n;
         }
 
         /// <summary>
@@ -33,14 +34,18 @@ namespace MyGame
         /// <param name="pos">Позиция коробля</param>/param>
         /// <param name="dir">Скорость корабля</param>
         /// <param name="size">Размер коробля</param>
-        public Ship(Point pos, Point dir, Size size) : base(pos, dir, size) { }
+        public Ship(Point pos, Point dir, Size size) : base(pos, dir, size) 
+        {
+            image = Image.FromFile("Space_Ship_Game.png");
+        }
 
         /// <summary>
         /// Метод отрисовывает коробль на игровом поле
         /// </summary>
         public override void Draw()
         {
-            Game.Buffer.Graphics.FillEllipse(Brushes.Wheat, Pos.X, Pos.Y, Size.Width, Size.Height);
+            Rectangle sz = new Rectangle(Pos.X, Pos.Y, Size.Width, Size.Height);
+            Game.Buffer.Graphics.DrawImage(image, sz);
         }
 
         /// <summary>
@@ -58,7 +63,7 @@ namespace MyGame
 
         public void Down()
         {
-            if (Pos.Y > Game.Height) Pos.Y = Pos.Y + Dir.Y;
+            if (Pos.Y < Game.Height) Pos.Y = Pos.Y + Dir.Y;
         }
 
         public void Die()

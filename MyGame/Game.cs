@@ -1,6 +1,7 @@
 using System;
 using System.Windows.Forms;
 using System.Drawing;
+using System.IO;
 
 namespace MyGame 
 {
@@ -9,6 +10,9 @@ namespace MyGame
     /// </summary>
 	static class Game 
 	{
+        public delegate void LogDelegate(string info);
+
+        public static LogDelegate logEvent;
         /// <summary>
         /// Предоставляет доступ к главному буферу
         /// графического контекста для текущего приложения 
@@ -22,7 +26,7 @@ namespace MyGame
         /// <summary>
         /// Корабль игрока
         /// </summary>
-        private static Ship _ship = new Ship(new Point(10, 400), new Point(5, 5), new Size(10, 10));
+        private static Ship _ship;
 
         /// <summary>
         /// Ширина игрового поля  
@@ -61,13 +65,12 @@ namespace MyGame
 		{ 
 			_objs = new BaseObject[100];
 
-			_bullet = new Bullet(new Point(0, 200), new Point(5, 0), new Size(10,3));
-
 			_asteroids = new Asteroid[30];
 			Random rnd = new Random();
 
+
             //Заполнение массива -objs[] звездами со случайной скоростью, позицией и размером
-			for (int i = 0; i < _objs.Length; i++)
+            for (int i = 0; i < _objs.Length; i++)
 			{
 				Point pos = new Point(rnd.Next(20, Width - 20), rnd.Next(20, Height - 20));
 				Point dir = new Point(rnd.Next(2, 14), 0);
@@ -113,8 +116,11 @@ namespace MyGame
 			//Cвязываем буфер в памяти с графическим объектом, чтобы рисовать в буфере
 			Buffer = _context.Allocate(g, new Rectangle(0, 0, Width, Height));
 
-			//Вызываем метод загрузки всех объектов в сцене
-			Load();
+
+            _ship = new Ship(new Point(10, 400), new Point(20, 20), new Size(35, 55));
+
+            //Вызываем метод загрузки всех объектов в сцене
+            Load();
 
 
             _timer.Start();
@@ -123,8 +129,9 @@ namespace MyGame
             //Добавляем обработку событий при нажатии клавиш
             form.KeyDown += Form_KeyDown;
 
-            //Добавляем в событие смерть корабля метод Finish
+            //Добавляем в событие смерть корабля - метод Finish
             Ship.MessageDie += Finish;
+            Game.logEvent += AddToLog;
 
         }
 
@@ -140,6 +147,7 @@ namespace MyGame
 			Update(); 
 		}
 
+
         /// <summary>
         /// Метод обрабатывающий нажатие 
         /// </summary>
@@ -148,9 +156,9 @@ namespace MyGame
         private static void Form_KeyDown(object sender, KeyEventArgs e)
         {
             //Обработка выстрела - клавиша 'Control'
-            Point bulPos = new Point(_ship.Rect.X + 10, _ship.Rect.Y + 4);
-            Point bulDir = new Point(0, 4);
-            if (e.KeyCode == Keys.ControlKey) _bullet = new Bullet(bulPos, bulDir, new Size(4, 1));
+            Point bulPos = new Point(_ship.Rect.X + _ship.Rect.Size.Width, _ship.Rect.Y + (_ship.Rect.Size.Height / 2));
+            Point bulDir = new Point(x: 15, y: 0);
+            if (e.KeyCode == Keys.ControlKey) _bullet = new Bullet(bulPos, bulDir, new Size(15, 10));
 
             //Обработка управления кораблем - клавиши 'Вверх' 'Вниз'
             if (e.KeyCode == Keys.Up) _ship.Up();
@@ -167,7 +175,7 @@ namespace MyGame
 				obj.Update();
 
             //Обновляем снаряд
-            _bullet.Update();
+            _bullet?.Update();
 
             //Обновляем каждый астероид
             for (var i = 0; i < _asteroids.Length; i++)
@@ -182,6 +190,8 @@ namespace MyGame
                 if (_bullet != null && _bullet.Collision(_asteroids[i]))
                 {
                     System.Media.SystemSounds.Hand.Play();
+                    string logInfoDest = $"Bullet was destroy asteroid in position (x:{_asteroids[i].Rect.X}, y: {_asteroids[i].Rect.Y})\n";
+                    logEvent?.Invoke(logInfoDest);
                     _asteroids[i] = null;
                     _bullet = null;
                     continue;
@@ -191,11 +201,21 @@ namespace MyGame
                 if (!_ship.Collision(_asteroids[i])) continue;
 
                 var rnd = new Random();
-                _ship?.EnergyDecrease(rnd.Next(1, 10));
+                int damage = rnd.Next(1, 10);
+                _ship?.EnergyDecrease(damage);
+                string logInfo = $"Ship get damaged for {damage} energy at pos (x:{_ship.Rect.X}, y: {_ship.Rect.Y})\n";
+                logEvent?.Invoke(logInfo);
                 System.Media.SystemSounds.Asterisk.Play();
 
                 //Если энергии после столкновения не осталось - корабль уничтожается
-                if (_ship.Energy <= 0) _ship?.Die();
+                if (_ship.Energy <= 0)
+                {
+                    logInfo = $"Ship was destroyed at pos (x:{_ship.Rect.X}, y: {_ship.Rect.Y})\n";
+                    
+                    logEvent?.Invoke(logInfo);
+                    _ship?.Die();
+                }
+
             }
 
 
@@ -217,7 +237,7 @@ namespace MyGame
 
             foreach (Asteroid a in _asteroids)
                 a?.Draw();
-
+            
 
             _bullet?.Draw();
             _ship?.Draw();
@@ -238,6 +258,20 @@ namespace MyGame
             _timer.Stop();
             Buffer.Graphics.DrawString("The End", new Font(FontFamily.GenericSansSerif, 60, FontStyle.Underline), Brushes.White, 200, 100);
             Buffer.Render();
+        }
+
+        private static void AddToLog(string info)
+        {
+            // Запись в файл
+            using (FileStream fstream = new FileStream($"GameLog.txt", FileMode.OpenOrCreate))
+            {
+                // Преобразуем строку в байты
+                byte[] array = System.Text.Encoding.Default.GetBytes(info);
+                // Запись массива байтов в файл
+                fstream.Write(array, 0, array.Length);
+                Console.WriteLine($"{info} log был записанзаписан в файл");
+            }
+
         }
     }
 

@@ -27,7 +27,6 @@ namespace MyGame
         public override void Draw()
         {
             Game.Buffer.Graphics.FillEllipse(Brushes.White, Pos.X, Pos.Y, Size.Width, Size.Height);
-            Console.WriteLine($"Asteroid was drawed at position (x: {Pos.X}, y: {Pos.Y})");
         }
 
         /// <summary>

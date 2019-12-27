@@ -7,21 +7,25 @@ using System.Drawing;
 
 namespace MyGame
 {
-    class Bullet : BaseObject 
+    class Bullet : BaseObject
     {
+        private Image image;
+        public int BulletSpeed {get; private set;} 
         public Bullet(Point pos, Point dir, Size size) : base(pos, dir, size)
         {
-
+            image = Image.FromFile("Game_Lazer.png");
+            BulletSpeed = dir.X;
         }
 
         public override void Draw()
         {
-            Game.Buffer.Graphics.DrawRectangle(Pens.OrangeRed, Pos.X, Pos.Y, Size.Width, Size.Height);
+            Rectangle sz = new Rectangle(Pos.X, Pos.Y, Size.Width, Size.Height);
+            Game.Buffer.Graphics.DrawImage(image, sz);
         }
 
         public override void Update()
         {
-            Pos.X = Pos.X + 3;
+            Pos.X = Pos.X + BulletSpeed;
         }
 
         /// <summary>

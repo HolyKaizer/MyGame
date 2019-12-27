@@ -8,7 +8,6 @@ namespace MyGame
     /// </summary>
     class Ship : BaseObject
     {
-        private Image image;
         /// <summary>
         /// Событие реагирующее на смерть
         /// </summary>
@@ -22,10 +21,19 @@ namespace MyGame
         /// <summary>
         /// Метод уменьшающий энергию корабля
         /// </summary>
-        /// <param name="n">Значение на которое стоит изменить</param>
+        /// <param name="n">Значение на которое изменяется</param>
         public void EnergyDecrease(int n)
         {
             Energy -= n;
+        }
+
+        /// <summary>
+        /// Метод увеличивающий энергию корабля
+        /// </summary>
+        /// <param name="n">Значение на которое изменяется</param>
+        public void EnergyIncrease(int n)
+        {
+            Energy += n;
         }
 
         /// <summary>
@@ -63,7 +71,7 @@ namespace MyGame
 
         public void Down()
         {
-            if (Pos.Y < Game.Height) Pos.Y = Pos.Y + Dir.Y;
+            if (Pos.Y < Game.Height - Size.Height) Pos.Y = Pos.Y + Dir.Y;
         }
 
         public void Die()

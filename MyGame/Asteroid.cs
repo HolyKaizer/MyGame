@@ -18,6 +18,7 @@ namespace MyGame
 
         public Asteroid(Point pos, Point dir, Size size ) : base(pos, dir, size)
         {
+            image = Image.FromFile("Asteroid_Game.png");
         }
 
 
@@ -26,7 +27,8 @@ namespace MyGame
         /// </summary>
         public override void Draw()
         {
-            Game.Buffer.Graphics.FillEllipse(Brushes.White, Pos.X, Pos.Y, Size.Width, Size.Height);
+            Rectangle sz = new Rectangle(Pos.X, Pos.Y, Size.Width, Size.Height);
+            Game.Buffer.Graphics.DrawImage(image, sz);
         }
 
         /// <summary>

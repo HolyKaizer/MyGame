@@ -9,7 +9,6 @@ namespace MyGame
 {
     class Bullet : BaseObject
     {
-        private Image image;
         public int BulletSpeed {get; private set;} 
         public Bullet(Point pos, Point dir, Size size) : base(pos, dir, size)
         {

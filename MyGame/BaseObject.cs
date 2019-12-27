@@ -22,7 +22,13 @@ namespace MyGame
         /// </summary>
         public delegate void Message();
 
+        /// <summary>
+        /// Общий рандом для случайных событий с объектом 
+        /// </summary>
         protected static Random random;
+
+        protected Image image = null;
+
         /// <summary>
         /// Позиция игрового объекта 
         /// </summary>

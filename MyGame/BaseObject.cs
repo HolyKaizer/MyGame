@@ -17,6 +17,11 @@ namespace MyGame
     /// </summary>
 	abstract class BaseObject: ICollision
 	{
+        /// <summary>
+        /// Обработчик событий
+        /// </summary>
+        public delegate void Message();
+
         protected static Random random;
         /// <summary>
         /// Позиция игрового объекта 

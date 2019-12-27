@@ -7,16 +7,23 @@ using System.Threading.Tasks;
 
 namespace MyGame
 {
-
-    class Asteroid : BaseObject, ICloneable
+    public interface IComparable<T>
     {
-        public int Power { get; set; }
+        int CompareTo(T obj);
+    }
+
+    class Asteroid : BaseObject, ICloneable, IComparable<Asteroid>
+    {
+        public int Power { get; set; } = 3;
 
         public Asteroid(Point pos, Point dir, Size size ) : base(pos, dir, size)
         {
-            Power = 1;
         }
 
+
+        /// <summary>
+        /// Отрисовка астероида на игровом поле
+        /// </summary>
         public override void Draw()
         {
             Game.Buffer.Graphics.FillEllipse(Brushes.White, Pos.X, Pos.Y, Size.Width, Size.Height);
@@ -29,12 +36,17 @@ namespace MyGame
         /// <returns></returns>
         public object Clone()
         {
+            //Создаем копию нашего астероида
             Asteroid asteroid = new Asteroid(new Point(Pos.X, Pos.Y), new Point(Dir.X, Dir.Y), new Size(Size.Width, Size.Height));
             asteroid.Power = Power;
 
             return asteroid;
         }
 
+
+        /// <summary>
+        /// Логика полета астероида
+        /// </summary>
         public override void Update()
         {
             Pos.X = Pos.X + Dir.X;
@@ -45,10 +57,27 @@ namespace MyGame
             if (Pos.Y > Game.Height) Dir.Y = -Dir.Y;
         }
 
+        /// <summary>
+        /// Обновляет позицию астероида на правую часть экрана
+        /// </summary>
         public void Reset()
         {
             Pos.X = Size.Width - 100;
             Pos.Y = random.Next(20, Game.Height - 20);
         }
+
+
+        /// <summary>
+        /// Проверяет 
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        int IComparable<Asteroid>.CompareTo(Asteroid obj)
+        {
+            if (Power > obj.Power) return 1;
+            if (Power < obj.Power) return -1;
+            return 0;
+        }
+
     }
 }

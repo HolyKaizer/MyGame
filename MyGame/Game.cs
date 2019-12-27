@@ -16,6 +16,13 @@ namespace MyGame
 		private static BufferedGraphicsContext _context;
 		public static BufferedGraphics Buffer;
 
+        private static Timer _timer = new Timer { Interval = 75 };
+        public static Random Rnd = new Random();
+
+        /// <summary>
+        /// Корабль игрока
+        /// </summary>
+        private static Ship _ship = new Ship(new Point(10, 400), new Point(5, 5), new Size(10, 10));
 
         /// <summary>
         /// Ширина игрового поля  
@@ -33,7 +40,7 @@ namespace MyGame
 		private static BaseObject[] _objs;
 
 		/// <summary>
-		/// 
+		/// Текущая пуля на игровом поле
 		/// </summary>
 		private static Bullet _bullet;
 
@@ -109,11 +116,17 @@ namespace MyGame
 			//Вызываем метод загрузки всех объектов в сцене
 			Load();
 
-			Timer timer = new Timer {Interval = 75};
-			timer.Start();
-			timer.Tick += Timer_Tick;
 
-		}
+            _timer.Start();
+            _timer.Tick += Timer_Tick;
+
+            //Добавляем обработку событий при нажатии клавиш
+            form.KeyDown += Form_KeyDown;
+
+            //Добавляем в событие смерть корабля метод Finish
+            Ship.MessageDie += Finish;
+
+        }
 
         /// <summary>
         /// Метод, вызывающийся каждый "тик"
@@ -128,19 +141,21 @@ namespace MyGame
 		}
 
         /// <summary>
-        /// Отрисовка игрового поля 
+        /// Метод обрабатывающий нажатие 
         /// </summary>
-		public static void Draw() 
-		{
-			//Вызываем отрисовку для каждого объекта
-			Buffer.Graphics.Clear(Color.Black);
-			foreach (BaseObject obj in _objs) 
-				obj.Draw();
-			foreach (Asteroid obj in _asteroids)
-				obj.Draw();
-			_bullet.Draw();
-			Buffer.Render();
-		}
+        /// <param name="sender">Отправитель события</param>
+        /// <param name="e">Дополнительный класс с аргументами делегата</param>
+        private static void Form_KeyDown(object sender, KeyEventArgs e)
+        {
+            //Обработка выстрела - клавиша 'Control'
+            Point bulPos = new Point(_ship.Rect.X + 10, _ship.Rect.Y + 4);
+            Point bulDir = new Point(0, 4);
+            if (e.KeyCode == Keys.ControlKey) _bullet = new Bullet(bulPos, bulDir, new Size(4, 1));
+
+            //Обработка управления кораблем - клавиши 'Вверх' 'Вниз'
+            if (e.KeyCode == Keys.Up) _ship.Up();
+            if (e.KeyCode == Keys.Down) _ship.Down();
+        }
 
         /// <summary>
         /// Обновление игрового поля
@@ -149,28 +164,82 @@ namespace MyGame
 		{
 			//Обновляем каждый объект
 			foreach (BaseObject obj in _objs) 
-				obj.Update(); 
-
-            //Обновляем каждый астероид 
-			foreach (Asteroid a in _asteroids)
-			{
-				a.Update();
-				if(a.Collision(_bullet))
-                {
-                    System.Media.SystemSounds.Hand.Play();
-                    _bullet.Reset();
-                    a.Reset();
-                }
-			}
+				obj.Update();
 
             //Обновляем снаряд
-			_bullet.Update();
+            _bullet.Update();
+
+            //Обновляем каждый астероид
+            for (var i = 0; i < _asteroids.Length; i++)
+            {
+                //Если текущий астероид не существует - переходим на следующую итерацию
+                if (_asteroids[i] == null) continue;
+
+                //Обновляем астероид
+                _asteroids[i].Update();
+
+                //Проверяем на сталкновение. Если произошло - убираем два объекта с поля и переходим на следующую итерацию
+                if (_bullet != null && _bullet.Collision(_asteroids[i]))
+                {
+                    System.Media.SystemSounds.Hand.Play();
+                    _asteroids[i] = null;
+                    _bullet = null;
+                    continue;
+                }
+
+                //Обрабатывем столкновение коробля и астероида
+                if (!_ship.Collision(_asteroids[i])) continue;
+
+                var rnd = new Random();
+                _ship?.EnergyDecrease(rnd.Next(1, 10));
+                System.Media.SystemSounds.Asterisk.Play();
+
+                //Если энергии после столкновения не осталось - корабль уничтожается
+                if (_ship.Energy <= 0) _ship?.Die();
+            }
+
+
 
             //Проверяем размеры экрана
             if (Width > 1000 || Height > 1000)
                 throw new ArgumentOutOfRangeException();
 		}
-	}
+
+        /// <summary>
+        /// Отрисовка игрового поля 
+        /// </summary>
+        public static void Draw()
+        {
+            //Вызываем отрисовку для каждого объекта
+            Buffer.Graphics.Clear(Color.Black);
+            foreach (BaseObject obj in _objs)
+                obj.Draw();
+
+            foreach (Asteroid a in _asteroids)
+                a?.Draw();
+
+
+            _bullet?.Draw();
+            _ship?.Draw();
+
+            //Отрисовка текущей энергии
+            if (_ship != null)
+                Buffer.Graphics.DrawString($"Energy: {_ship?.Energy}", SystemFonts.DefaultFont, Brushes.White, 0, 0);
+
+
+            Buffer.Render();
+        }
+
+        /// <summary>
+        /// Метод заканчивающий игру 
+        /// </summary>
+        public static void Finish()
+        {
+            _timer.Stop();
+            Buffer.Graphics.DrawString("The End", new Font(FontFamily.GenericSansSerif, 60, FontStyle.Underline), Brushes.White, 200, 100);
+            Buffer.Render();
+        }
+    }
 
 }
 

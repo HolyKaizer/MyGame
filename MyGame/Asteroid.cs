@@ -68,8 +68,6 @@ namespace MyGame
         {
             Pos.X = Size.Width - 100;
             Pos.Y = random.Next(20, Game.Height - 20);
-            var some = new int[12];
-            typeof(some);
         }
 
 

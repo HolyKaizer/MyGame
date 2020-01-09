@@ -229,12 +229,27 @@ namespace MyGame
             foreach (Bullet b in _bullets)
                 b.Update();
 
+            // Создание переменной для дальнейшей записи в файл
+            string logInfo;
+
+            // Проверяем на сталкновение коробля с аптечкой.
+            // Если произошло - убираем аптечку и добавляем энергию караблю
+            if (_medkit != null && _medkit.Collision(_ship))
+            {
+                // Запись лога в файл
+                logInfo = $"Ship get medkit for {_medkit.RecoverEnergy} energy at pos (x:{_ship.Rect.X}, y: {_ship.Rect.Y})";
+                logEvent?.Invoke(logInfo);
+
+                // Увеличение энергии коробля
+                _ship?.EnergyIncrease(_medkit.RecoverEnergy);
+                System.Media.SystemSounds.Exclamation.Play();
+
+                _medkit = null;
+            }
 
             // Обновляем каждый астероид
             for (var i = 0; i < _asteroids.Length; i++)
             {
-                // Создание переменной для дальнейшей записи в файл
-                string logInfo;
 
                 // Если текущий астероид не существует - переходим на следующую итерацию
                 if (_asteroids[i] == null) continue;
@@ -242,10 +257,15 @@ namespace MyGame
                 // Обновляем астероид
                 _asteroids[i].Update();
 
+                bool asteroidWasDestroyed = false;
                 // Проверяем на сталкновение пули с астероидом.
                 // Если произошло - убираем два объекта с поля и переходим на следующую
                 // итерацию
                 for (int j = 0; j < _bullets.Count; j++)
+                {
+                    if (_bullets[j] == null)
+                        continue;
+
                     if (_asteroids[i] != null && _bullets[j].Collision(_asteroids[i]))
                     {
                         // Запись лога в файл
@@ -254,25 +274,14 @@ namespace MyGame
 
                         System.Media.SystemSounds.Hand.Play();
                         _asteroids[i] = null;
+                        asteroidWasDestroyed = true;
                         _bullets.RemoveAt(j);
                         j--;
                     }
-
-                // Проверяем на сталкновение коробля с аптечкой.
-                // Если произошло - убираем аптечку и добавляем энергию караблю
-                if (_medkit != null && _medkit.Collision(_ship))
-                {
-                    // Запись лога в файл
-                    logInfo = $"Ship get medkit for {_medkit.RecoverEnergy} energy at pos (x:{_ship.Rect.X}, y: {_ship.Rect.Y})";
-                    logEvent?.Invoke(logInfo);
-
-                    // Увеличение энергии коробля
-                    _ship?.EnergyIncrease(_medkit.RecoverEnergy);
-                    System.Media.SystemSounds.Exclamation.Play();
-
-                    _medkit = null;
                 }
 
+                //Если астероид уничтожила пуля 
+                if (asteroidWasDestroyed) continue;
 
                 // Обрабатывем столкновение коробля и астероида
                 if (!_ship.Collision(_asteroids[i])) continue;

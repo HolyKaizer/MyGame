@@ -78,10 +78,15 @@ namespace MyGame
 		/// </summary>
 		private static List<Bullet> _bullets = new List<Bullet>();
 
+        /// <summary>
+        /// Стартовое колличество астероидов
+        /// </summary>
+        private static int InitialAsteroidsSpawn = 15;
+
 		/// <summary>
-		/// Массив астероидов в игре
+		/// Список астероидов в игре 
 		/// </summary>
-		private static Asteroid[] _asteroids;
+		private static List<Asteroid> _asteroids = new List<Asteroid>();
 
 		static Game() 
 		{
@@ -95,7 +100,6 @@ namespace MyGame
 		{ 
 			_objs = new BaseObject[100];
 
-			_asteroids = new Asteroid[10];
 
             // Заполнение массива -objs[] звездами со случайной скоростью, позицией и размером
             for (int i = 0; i < _objs.Length; i++)
@@ -108,18 +112,9 @@ namespace MyGame
 				_objs[i] = new Star(pos, dir, sz);
 
 			}
-             
-			// Заполнение массива _asteroids[] астероидами со случайной скоростью, позицией и размером
-			for (int i = 0; i < _asteroids.Length; i++)
-			{
-				Point pos = new Point(Width - 50, Rnd.Next(20, Height - 20));
-				Point dir = new Point(Rnd.Next(2, 7), Rnd.Next(5, 20));
-				int objWidth = Rnd.Next(30, 60);
-				Size sz = new Size(objWidth, objWidth);
 
-				_asteroids[i] = new Asteroid(pos, dir, sz);
-
-			}
+            // Заполнение массива _asteroids[] астероидами со случайной скоростью, позицией и размером
+            SpawnAsteroids();
 		}
 
         /// <summary>
@@ -177,6 +172,22 @@ namespace MyGame
 			Update(); 
 		}
 
+        /// <summary>
+        /// Функция инициализирующая начальный список астероидов
+        /// </summary>
+        private static void SpawnAsteroids()
+        {
+            for (int i = 0; i < InitialAsteroidsSpawn; i++)
+            {
+                Point pos = new Point(Width - 50, Rnd.Next(20, Height - 20));
+                Point dir = new Point(Rnd.Next(2, 7), Rnd.Next(5, 20));
+                int objWidth = Rnd.Next(30, 60);
+                Size sz = new Size(objWidth, objWidth);
+
+                _asteroids.Add(new Asteroid(pos, dir, sz));
+
+            }
+        }
 
         /// <summary>
         /// Метод обрабатывающий нажатие 
@@ -247,13 +258,10 @@ namespace MyGame
                 _medkit = null;
             }
 
+
             // Обновляем каждый астероид
-            for (var i = 0; i < _asteroids.Length; i++)
+            for (var i = 0; i < _asteroids.Count; i++)
             {
-
-                // Если текущий астероид не существует - переходим на следующую итерацию
-                if (_asteroids[i] == null) continue;
-
                 // Обновляем астероид
                 _asteroids[i].Update();
 
@@ -263,25 +271,33 @@ namespace MyGame
                 // итерацию
                 for (int j = 0; j < _bullets.Count; j++)
                 {
-                    if (_bullets[j] == null)
-                        continue;
-
-                    if (_asteroids[i] != null && _bullets[j].Collision(_asteroids[i]))
+                    if (_bullets[j].Collision(_asteroids[i]))
                     {
                         // Запись лога в файл
                         logInfo = $"Bullet was destroy asteroid in position and player get {PointsPerAsteroid} points at position (x:{_asteroids[i].Rect.X}, y: {_asteroids[i].Rect.Y}) ";
                         logEvent?.Invoke(logInfo);
 
                         System.Media.SystemSounds.Hand.Play();
-                        _asteroids[i] = null;
+                        _asteroids.RemoveAt(i);
                         asteroidWasDestroyed = true;
                         _bullets.RemoveAt(j);
-                        j--;
+                        break;
                     }
                 }
 
-                //Если астероид уничтожила пуля 
-                if (asteroidWasDestroyed) continue;
+                if (_asteroids.Count == 0 )
+                {
+                    InitialAsteroidsSpawn += 1;
+                    SpawnAsteroids();
+
+                    // Запись лога в файл
+                    logInfo = $"All asteroids was destroyed and spawn another list with {InitialAsteroidsSpawn} asteroids"; 
+                    logEvent?.Invoke(logInfo);
+                }
+
+                // Если астероид уничтожила пуля 
+                if (asteroidWasDestroyed)
+                    continue;
 
                 // Обрабатывем столкновение коробля и астероида
                 if (!_ship.Collision(_asteroids[i])) continue;
@@ -295,8 +311,8 @@ namespace MyGame
                 logEvent?.Invoke(logInfo);
 
                 System.Media.SystemSounds.Asterisk.Play();
-                _asteroids[i] = null;
-
+                _asteroids.RemoveAt(i);
+                
                 // Если энергии после столкновения не осталось - корабль уничтожается
                 if (_ship.Energy <= 0)
                 {

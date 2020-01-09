@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Drawing;
 using System.IO;
@@ -13,7 +14,7 @@ namespace MyGame
         /// <summary>
         /// Делегат отвечающий за вывод логов
         /// </summary>
-        /// <param name="info"></param>
+        /// <param name="info">Лог, записываемый в файл</param>
         public delegate void LogDelegate(string info);
 
         /// <summary>
@@ -73,9 +74,9 @@ namespace MyGame
 		private static BaseObject[] _objs;
 
 		/// <summary>
-		/// Текущая пуля на игровом поле
+		/// Текущий список пуль на экране 
 		/// </summary>
-		private static Bullet _bullet;
+		private static List<Bullet> _bullets = new List<Bullet>();
 
 		/// <summary>
 		/// Массив астероидов в игре
@@ -187,7 +188,8 @@ namespace MyGame
             // Обработка выстрела - клавиша 'Control'
             Point bulPos = new Point(_ship.Rect.X + _ship.Rect.Size.Width, _ship.Rect.Y + (_ship.Rect.Size.Height / 2));
             Point bulDir = new Point(x: 15, y: 0);
-            if (e.KeyCode == Keys.ControlKey) _bullet = new Bullet(bulPos, bulDir, new Size(15, 10));
+            if (e.KeyCode == Keys.ControlKey)
+                _bullets.Add(new Bullet(bulPos, bulDir, new Size(15, 10)));
 
             // Обработка управления кораблем - клавиши 'Вверх' 'Вниз'
             if (e.KeyCode == Keys.Up) _ship.Up();
@@ -224,7 +226,9 @@ namespace MyGame
 				obj.Update();
 
             // Обновляем снаряд
-            _bullet?.Update();
+            foreach (Bullet b in _bullets)
+                b.Update();
+
 
             // Обновляем каждый астероид
             for (var i = 0; i < _asteroids.Length; i++)
@@ -238,6 +242,24 @@ namespace MyGame
                 // Обновляем астероид
                 _asteroids[i].Update();
 
+                // Проверяем на сталкновение пули с астероидом.
+                // Если произошло - убираем два объекта с поля и переходим на следующую
+                // итерацию
+                for (int j = 0; j < _bullets.Count; j++)
+                    if (_asteroids[i] != null && _bullets[j].Collision(_asteroids[i]))
+                    {
+                        // Запись лога в файл
+                        logInfo = $"Bullet was destroy asteroid in position and player get {PointsPerAsteroid} points at position (x:{_asteroids[i].Rect.X}, y: {_asteroids[i].Rect.Y}) ";
+                        logEvent?.Invoke(logInfo);
+
+                        System.Media.SystemSounds.Hand.Play();
+                        _asteroids[i] = null;
+                        _bullets.RemoveAt(j);
+                        j--;
+                    }
+
+                // Проверяем на сталкновение коробля с аптечкой.
+                // Если произошло - убираем аптечку и добавляем энергию караблю
                 if (_medkit != null && _medkit.Collision(_ship))
                 {
                     // Запись лога в файл
@@ -251,20 +273,6 @@ namespace MyGame
                     _medkit = null;
                 }
 
-                // Проверяем на сталкновение. Если произошло - убираем два объекта с поля и переходим на следующую итерацию
-                if (_bullet != null && _bullet.Collision(_asteroids[i]))
-                {
-                    System.Media.SystemSounds.Hand.Play();
-
-                    // Запись лога в файл
-                    logInfo = $"Bullet was destroy asteroid in position and player get {PointsPerAsteroid} points at position (x:{_asteroids[i].Rect.X}, y: {_asteroids[i].Rect.Y}) ";
-                    logEvent?.Invoke(logInfo);
-
-                    _asteroids[i] = null;
-                    _bullet = null;
-                    Points += PointsPerAsteroid;
-                    continue;
-                }
 
                 // Обрабатывем столкновение коробля и астероида
                 if (!_ship.Collision(_asteroids[i])) continue;
@@ -286,6 +294,7 @@ namespace MyGame
                     // Запись лога в файл
                     logInfo = $"Ship was destroyed at pos (x:{_ship.Rect.X}, y: {_ship.Rect.Y})";
                     logEvent?.Invoke(logInfo);
+
                     _ship?.Die();
                 }
 
@@ -309,8 +318,10 @@ namespace MyGame
             foreach (Asteroid a in _asteroids)
                 a?.Draw();
 
+            foreach (Bullet b in _bullets)
+                b.Draw();
+
             _medkit?.Draw();
-            _bullet?.Draw();
             _ship?.Draw();
 
             // Отрисовка текущей энергии и очков

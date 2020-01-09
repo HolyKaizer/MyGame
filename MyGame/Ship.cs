@@ -4,7 +4,7 @@ using System.Drawing;
 namespace MyGame
 {
     /// <summary>
-    /// Класс представляет корабль игрока
+    /// Класс, представляющий корабль игрока
     /// </summary>
     class Ship : BaseObject
     {
@@ -64,16 +64,25 @@ namespace MyGame
 
         }
 
+        /// <summary>
+        /// Изменение положения коробля вверх на игровом поле на значение Dir.Y 
+        /// </summary>
         public void Up()
         {
             if (Pos.Y > 0) Pos.Y = Pos.Y - Dir.Y;
         }
 
+        /// <summary>
+        /// Изменение положения коробля вниз на игровом поле на значение Dir.Y 
+        /// </summary>
         public void Down()
         {
             if (Pos.Y < Game.Height - Size.Height) Pos.Y = Pos.Y + Dir.Y;
         }
 
+        /// <summary>
+        /// Метод обрабатывающий уничтожение коробля  
+        /// </summary>
         public void Die()
         {
             MessageDie?.Invoke();

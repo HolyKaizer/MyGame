@@ -9,9 +9,12 @@ namespace MyGame
 {
     public interface IComparable<T>
     {
-        int CompareTo(T obj);
+        int CompareTo(T obj); 
     }
 
+    /// <summary>
+    /// Класс, представляющий астероид на игровом поле 
+    /// </summary>
     class Asteroid : BaseObject, ICloneable, IComparable<Asteroid>
     {
         public int Power { get; set; } = 3;
@@ -65,11 +68,13 @@ namespace MyGame
         {
             Pos.X = Size.Width - 100;
             Pos.Y = random.Next(20, Game.Height - 20);
+            var some = new int[12];
+            typeof(some);
         }
 
 
         /// <summary>
-        /// Проверяет 
+        /// Проверяет силу двух астероидов 
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>

@@ -7,6 +7,9 @@ using System.Drawing;
 
 namespace MyGame
 {
+    /// <summary>
+    /// Класс, представляющий выстрел на игровом поле
+    /// </summary>
     class Bullet : BaseObject
     {
         public int BulletSpeed {get; private set;} 

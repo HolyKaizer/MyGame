@@ -13,7 +13,8 @@ namespace MyGame
     }
 
     /// <summary>
-    /// Базовый класс в иерархии игровых объектов
+    /// Базовый класс в иерархии игровых объектов,
+    /// реализует интерфейс ICollision для обработки столкновений 
     /// </summary>
 	abstract class BaseObject: ICollision
 	{
@@ -27,6 +28,9 @@ namespace MyGame
         /// </summary>
         protected static Random random;
 
+        /// <summary>
+        /// Картинка у объекта
+        /// </summary>
         protected Image image = null;
 
         /// <summary>

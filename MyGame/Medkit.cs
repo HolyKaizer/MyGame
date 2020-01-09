@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace MyGame
 {
+    /// <summary>
+    /// Класс, представляющий "Аптечку" на игровом поле 
+    /// </summary>
     class Medkit : BaseObject
     {
         /// <summary>

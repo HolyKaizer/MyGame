@@ -9,15 +9,19 @@ namespace MyGame
 {
     public interface IComparable<T>
     {
-        int CompareTo(T obj);
+        int CompareTo(T obj); 
     }
 
+    /// <summary>
+    /// Класс, представляющий астероид на игровом поле 
+    /// </summary>
     class Asteroid : BaseObject, ICloneable, IComparable<Asteroid>
     {
         public int Power { get; set; } = 3;
 
         public Asteroid(Point pos, Point dir, Size size ) : base(pos, dir, size)
         {
+            image = Image.FromFile("Asteroid_Game.png");
         }
 
 
@@ -26,8 +30,8 @@ namespace MyGame
         /// </summary>
         public override void Draw()
         {
-            Game.Buffer.Graphics.FillEllipse(Brushes.White, Pos.X, Pos.Y, Size.Width, Size.Height);
-            Console.WriteLine($"Asteroid was drawed at position (x: {Pos.X}, y: {Pos.Y})");
+            Rectangle sz = new Rectangle(Pos.X, Pos.Y, Size.Width, Size.Height);
+            Game.Buffer.Graphics.DrawImage(image, sz);
         }
 
         /// <summary>
@@ -68,7 +72,7 @@ namespace MyGame
 
 
         /// <summary>
-        /// Проверяет 
+        /// Проверяет силу двух астероидов 
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>

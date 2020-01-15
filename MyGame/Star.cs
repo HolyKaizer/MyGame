@@ -8,7 +8,6 @@ namespace MyGame
     /// </summary>
 	class Star : BaseObject
 	{
-        private Image image;
 
         /// <summary>
         /// Конструктор, задающий все поля  
@@ -23,11 +22,10 @@ namespace MyGame
 
         
         /// <summary>
-        /// Метод отрисовывает звуезду на игровом поле    
+        /// Метод отрисовывает звезду на игровом поле    
         /// </summary>
 		public override void Draw()
 		{
-			
 			Rectangle sz = new Rectangle(Pos.X, Pos.Y, Size.Width, Size.Height);
 			Game.Buffer.Graphics.DrawImage(image, sz);
 		}
